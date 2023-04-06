@@ -7,13 +7,9 @@ module.exports = (req, res, next) => {
     return res.status(401).json({ message: 'Token not found' });
   }
 
-  try {
-    const decoded = verifyToken(token);
+  const decoded = verifyToken(token);
 
-    req.user = decoded;
+  req.user = decoded;
 
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Expired or invalid token' });
-  }
+  next();
 };
