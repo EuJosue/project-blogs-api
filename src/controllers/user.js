@@ -8,6 +8,22 @@ const register = async (req, res) => {
   return res.status(201).json({ token });
 };
 
+const findAll = async (_req, res) => {
+  const users = await userService.findAll();
+
+  return res.status(200).json(users);
+};
+
+const findById = async (req, res) => {
+  const { id } = req.params;
+
+  const user = await userService.findById(id);
+
+  return res.status(200).json(user);
+};
+
 module.exports = {
   register,
+  findAll,
+  findById,
 };

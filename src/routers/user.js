@@ -1,7 +1,12 @@
 const router = require('express').Router();
-const { userRouter } = require('../controllers');
+const { userController } = require('../controllers');
 const { validateNewUser } = require('../middlewares/validateNewUser');
+const validateToken = require('../middlewares/validateToken');
 
-router.post('/', validateNewUser, userRouter.register);
+router.post('/', validateNewUser, userController.register);
+
+router.get('/', validateToken, userController.findAll);
+
+router.get('/:id', validateToken, userController.findById);
 
 module.exports = router;

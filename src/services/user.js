@@ -15,6 +15,22 @@ const register = async (user) => {
   return token;
 };
 
+const findAll = async () => {
+  const users = await User.findAll({ attributes: { exclude: ['password'] } });
+
+  return users;
+};
+
+const findById = async (id) => {
+  const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
+  console.log(user);
+  if (!user) throw httpError.notFound('User does not exist');
+
+  return user;
+};
+
 module.exports = {
   register,
+  findAll,
+  findById,
 };
