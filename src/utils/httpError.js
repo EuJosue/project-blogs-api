@@ -6,6 +6,7 @@ const httpError = {
   unprocessableEntity: (message) => new ApiError(422, message),
   unauthorized: (message) => new ApiError(401, message),
   forbidden: (message) => new ApiError(403, message),
+  conflict: (message) => new ApiError(409, message),
 };
 
 module.exports = httpError;
