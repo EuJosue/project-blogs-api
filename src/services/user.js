@@ -29,8 +29,11 @@ const findById = async (id) => {
   return user;
 };
 
+const remove = async (id) => User.destroy({ where: { id } });
+
 module.exports = {
   register,
   findAll,
   findById,
+  remove,
 };
