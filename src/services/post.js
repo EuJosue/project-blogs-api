@@ -44,8 +44,18 @@ const findById = async (id) => {
   return post;
 };
 
+const remove = async (id, userId) => {
+  const post = await BlogPost.findByPk(id);
+
+  if (!post) throw httpError.notFound('Post does not exist');
+  if (post.userId !== userId) throw httpError.unauthorized('Unauthorized user');
+
+  await BlogPost.destroy({ where: { id } });
+};
+
 module.exports = {
   create,
   findAll,
   findById,
+  remove,
 };

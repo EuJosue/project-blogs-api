@@ -22,8 +22,16 @@ const findById = async (req, res) => {
   return res.status(200).json(post);
 };
 
+const remove = async (req, res) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  await postService.remove(+id, +userId);
+  return res.status(204).json();
+};
+
 module.exports = {
   create,
   findAll,
   findById,
+  remove,
 };
