@@ -1,4 +1,4 @@
-const { BlogPost, PostCategory, Category } = require('../models');
+const { BlogPost, PostCategory, Category, User } = require('../models');
 const httpError = require('../utils/httpError');
 
 const create = async (title, content, categoriesIds, userId) => {
@@ -20,6 +20,32 @@ const create = async (title, content, categoriesIds, userId) => {
   return post;
 };
 
+const findAll = async () => {
+  const posts = await BlogPost.findAll({
+    include: [
+      { model: Category, as: 'categories', through: { attributes: [] } },
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+    ],
+  });
+  
+  return posts;
+};
+
+const findById = async (id) => {
+  const post = await BlogPost.findByPk(id, {
+    include: [
+      { model: Category, as: 'categories', through: { attributes: [] } },
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+    ],
+  });
+
+  if (!post) throw httpError.notFound('Post does not exist');
+  
+  return post;
+};
+
 module.exports = {
   create,
+  findAll,
+  findById,
 };
