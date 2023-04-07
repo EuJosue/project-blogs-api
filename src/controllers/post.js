@@ -29,9 +29,20 @@ const remove = async (req, res) => {
   return res.status(204).json();
 };
 
+const update = async (req, res) => {
+  const { id } = req.params;
+  const { id: userId } = req.user;
+  const { title, content } = req.body;
+
+  const post = await postService.update(+id, title, content, +userId);
+
+  return res.status(200).json(post);
+};
+
 module.exports = {
   create,
   findAll,
   findById,
   remove,
+  update,
 };
