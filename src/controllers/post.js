@@ -39,10 +39,19 @@ const update = async (req, res) => {
   return res.status(200).json(post);
 };
 
+const search = async (req, res) => {
+  const { q } = req.query;
+  
+  const posts = await postService.search(q);
+  
+  return res.status(200).json(posts);
+};
+
 module.exports = {
   create,
   findAll,
   findById,
   remove,
   update,
+  search,
 };

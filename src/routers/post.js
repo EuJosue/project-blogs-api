@@ -4,14 +4,18 @@ const validatePost = require('../middlewares/validatePost');
 const validateToken = require('../middlewares/validateToken');
 const validateUpdatePost = require('../middlewares/validateUpdatePost');
 
-router.post('/', validateToken, validatePost, postController.create);
+router.use(validateToken);
 
-router.get('/', validateToken, postController.findAll);
+router.post('/', validatePost, postController.create);
 
-router.get('/:id', validateToken, postController.findById);
+router.get('/', postController.findAll);
 
-router.delete('/:id', validateToken, postController.remove);
+router.get('/search', postController.search);
 
-router.put('/:id', validateToken, validateUpdatePost, postController.update);
+router.get('/:id', postController.findById);
+
+router.delete('/:id', postController.remove);
+
+router.put('/:id', validateUpdatePost, postController.update);
 
 module.exports = router;

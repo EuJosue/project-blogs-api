@@ -1,4 +1,4 @@
-const { BlogPost, PostCategory, Category, User } = require('../models');
+const { BlogPost, PostCategory, Category, User, Sequelize } = require('../models');
 const httpError = require('../utils/httpError');
 
 const create = async (title, content, categoriesIds, userId) => {
@@ -27,7 +27,7 @@ const findAll = async () => {
       { model: User, as: 'user', attributes: { exclude: ['password'] } },
     ],
   });
-  
+
   return posts;
 };
 
@@ -40,7 +40,7 @@ const findById = async (id) => {
   });
 
   if (!post) throw httpError.notFound('Post does not exist');
-  
+
   return post;
 };
 
@@ -70,10 +70,27 @@ const update = async (id, title, content, userId) => {
   });
 };
 
+const search = async (q) => {
+  const posts = await BlogPost.findAll({
+    where: {
+      [Sequelize.Op.or]: [
+        { title: { [Sequelize.Op.substring]: q } },
+        { content: { [Sequelize.Op.substring]: q } },
+      ],
+    },
+    include: [
+      { model: Category, as: 'categories', through: { attributes: [] } },
+      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+    ],
+  });
+  return posts;
+};
+
 module.exports = {
   create,
   findAll,
   findById,
   remove,
   update,
+  search,
 };
