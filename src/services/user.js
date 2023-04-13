@@ -16,13 +16,13 @@ const register = async (user) => {
 };
 
 const findAll = async () => {
-  const users = await User.findAll({ attributes: { exclude: ['password'] } });
+  const users = await User.scope('withoutPassword').findAll();
 
   return users;
 };
 
 const findById = async (id) => {
-  const user = await User.findByPk(id, { attributes: { exclude: ['password'] } });
+  const user = await User.scope('withoutPassword').findByPk(id);
   console.log(user);
   if (!user) throw httpError.notFound('User does not exist');
 

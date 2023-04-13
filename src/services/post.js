@@ -24,7 +24,7 @@ const findAll = async () => {
   const posts = await BlogPost.findAll({
     include: [
       { model: Category, as: 'categories', through: { attributes: [] } },
-      { model: User, as: 'user', attributes: { exclude: ['password'] } },
+      { model: User.scope('withoutPassword'), as: 'user' },
     ],
   });
 

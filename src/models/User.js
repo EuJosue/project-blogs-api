@@ -22,6 +22,10 @@ const UserSchema = (sequelize, DataTypes) => {
       foreignKey: 'userId',
       as: 'posts'
     })
+
+    UserTable.addScope('withoutPassword', {
+      attributes: { exclude: ['password'] }
+    });
   }
 
   return UserTable;
