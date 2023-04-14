@@ -1,43 +1,29 @@
-const { BlogPost, PostCategory, Category, User, Sequelize } = require('../models');
+const { BlogPost, PostCategory, Sequelize, sequelize } = require('../models');
 const httpError = require('../utils/httpError');
 
 const create = async (title, content, categoriesIds, userId) => {
-  const categories = await Promise.all(categoriesIds.map((categoryId) => (
-    Category.findByPk(categoryId)
-  )));
+  const result = await sequelize.transaction(async (transaction) => {
+    const post = await BlogPost.create({ title, content, userId }, { transaction });
 
-  categories.forEach((category) => {
-    if (!category) throw httpError.badRequest('one or more "categoryIds" not found');
+    await PostCategory.bulkCreate(
+      categoriesIds.map((categoryId) => ({ categoryId, postId: post.id })),
+      { transaction },
+    );
+
+    return post;
   });
 
-  const post = await BlogPost
-    .create({ title, content, userId, published: new Date(), updated: new Date() });
-
-  await Promise.all(categoriesIds.map((categoryId) => (
-    PostCategory.create({ postId: post.id, categoryId })
-  )));
-
-  return post;
+  return result;
 };
 
 const findAll = async () => {
-  const posts = await BlogPost.findAll({
-    include: [
-      { model: Category, as: 'categories', through: { attributes: [] } },
-      { model: User.scope('withoutPassword'), as: 'user' },
-    ],
-  });
+  const posts = await BlogPost.scope('withUserAndCategories').findAll();
 
   return posts;
 };
 
 const findById = async (id) => {
-  const post = await BlogPost.findByPk(id, {
-    include: [
-      { model: Category, as: 'categories', through: { attributes: [] } },
-      { model: User, as: 'user', attributes: { exclude: ['password'] } },
-    ],
-  });
+  const post = await BlogPost.scope('withUserAndCategories').findByPk(id);
 
   if (!post) throw httpError.notFound('Post does not exist');
 
@@ -62,26 +48,17 @@ const update = async (id, title, content, userId) => {
 
   if (!editedPost) throw httpError.notFound('Post does not exist');
 
-  return BlogPost.findByPk(id, {
-    include: [
-      { model: Category, as: 'categories', through: { attributes: [] } },
-      { model: User, as: 'user', attributes: { exclude: ['password'] } },
-    ],
-  });
+  return BlogPost.scope('withUserAndCategories').findByPk(id);
 };
 
 const search = async (q) => {
-  const posts = await BlogPost.findAll({
+  const posts = await BlogPost.scope('withUserAndCategories').findAll({
     where: {
       [Sequelize.Op.or]: [
         { title: { [Sequelize.Op.substring]: q } },
         { content: { [Sequelize.Op.substring]: q } },
       ],
     },
-    include: [
-      { model: Category, as: 'categories', through: { attributes: [] } },
-      { model: User, as: 'user', attributes: { exclude: ['password'] } },
-    ],
   });
   return posts;
 };

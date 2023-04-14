@@ -18,11 +18,20 @@ const BlogPostSchema = (sequelize, DataTypes) => {
       timestamps: false
     });
 
-  BlogPostTable.associate = ({ User }) => {
+  BlogPostTable.associate = (models) => {
+    const { User, Category } = models;
+
     BlogPostTable.belongsTo(User, {
       foreignKey: 'userId',
       as: 'user'
-    })
+    });
+
+    BlogPostTable.addScope('withUserAndCategories', () => ({
+        include: [
+          { model: Category, as: 'categories', through: { attributes: [] } },
+          { model: User.scope('withoutPassword'), as: 'user' },
+        ],
+      }));
   }
 
   return BlogPostTable;
